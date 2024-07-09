@@ -1,18 +1,2 @@
 class java.lang.String cannot be cast to class org.springframework.security.oauth2.jwt.Jwt (java.lang.String is in module java.base of loader 'bootstrap'; org.springframework.security.oauth2.jwt.Jwt is in unnamed module of loader 'app')
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
-import com.carefirst.nexus.pcp.entity.Entity;
-
-@Repository
-public interface Repository extends JpaRepository<Entity, Integer>, QuerydslPredicateExecutor<Entity> {
-
-	@Query(nativeQuery = true, value= "SELECT * FROM transaction p where p.id = :srcId and p.cd = :Code and pnbr = :tranId") 
-	public Entity findByMemberPcpCriteria(@Param("srcSysMemId") String srcSysMemId,@Param("Code") String Code,
-			@Param("tranId") String transId);
-
-}
