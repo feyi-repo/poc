@@ -1,2 +1,42 @@
-class java.lang.String cannot be cast to class org.springframework.security.oauth2.jwt.Jwt (java.lang.String is in module java.base of loader 'bootstrap'; org.springframework.security.oauth2.jwt.Jwt is in unnamed module of loader 'app')
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
+import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 
+@Configuration
+public class OAuthConfig {
+
+	private static final Logger LOG = LogManager.getLogger(OAuthConfig.class);
+	
+	@Bean
+	@Scope(value = "req", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public DefaultOAuth2ClientContext oauth2ClientContext() {
+		LOG.debug(">");
+		try {
+			DefaultOAuth2ClientContext context = new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
+			Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+			if (principal instanceof OAuth2Authentication) {
+				OAuth2Authentication authentication = (OAuth2Authentication) principal;
+				Object details = authentication.getDetails();
+				if (details instanceof OAuth2AuthenticationDetails) {
+					OAuth2AuthenticationDetails oauthsDetails = (OAuth2AuthenticationDetails) details;
+					String token = oauthsDetails.getTokenValue();
+					context.setAccessToken(new DefaultOAuth2AccessToken(token));
+				}
+			}
+			return context;
+		} finally {
+			LOG.debug("< ");
+		}
+	}
+	
+}
