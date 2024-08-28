@@ -1,0 +1,13 @@
+MvcRequestMatcherCaused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.security.web.SecurityFilterChain]: 
+Factory method 'filterChain' threw exception with message: This method cannot decide whether these patterns are Spring MVC patterns or not. If 
+this endpoint is a Spring MVC endpoint, please use requestMatchers(MvcRequestMatcher); otherwise, please use requestMatchers(AntPathRequestMatcher).
+
+This is because there is more than one mappable servlet in your servlet context: {org.springframework.web.servlet.DispatcherServlet=[/basetime/*], org.apache.cxf.transport.servlet.CXFServlet=[/services/*]}.
+
+For each MvcRequestMatcher, call MvcRequestMatcher#setServletPath to indicate the servlet path.
+        at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:178)
+        at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:651)
+        ... 42 more
+Caused by: java.lang.IllegalArgumentException: This method cannot decide whether these patterns are Spring MVC patterns or not. If this endpoint is a Spring MVC endpoint, please use requestMatchers(MvcRequestMatcher); otherwise, please use requestMatchers(AntPathRequestMatcher).       
+
+This is because there is more than one mappable servlet in your servlet context: {org.springframework.web.servlet.DispatcherServlet=[/eobs-ms/*], org.apache.cxf.transport.servlet.CXFServlet=[/services/*]}.
