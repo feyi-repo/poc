@@ -1,0 +1,50 @@
+@Configuration
+   @EnableWebSecurity
+   public class SecurityConfig {
+
+       @Autowired
+       private MvcRequestMatcher.Builder mvcMatcherBuilder;
+
+       @Bean
+       public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+           http
+               .authorizeHttpRequests(authz -> authz
+                   .requestMatchers(mvcMatcherBuilder.pattern("/eobs-ms/**")).authenticated()
+                   .requestMatchers(AntPathRequestMatcher.antMatcher("/services/**")).authenticated()
+                   // Add other security rules as needed
+                   .anyRequest().authenticated()
+               )
+               .csrf(csrf -> csrf.disable())  // Be cautious with CSRF disable, only if necessary
+               // Add other security configurations as needed
+               ;
+           return http.build();
+       }
+
+       @Bean
+       public MvcRequestMatcher.Builder mvcMatcherBuilder(HandlerMappingIntrospector introspector) {
+           return new MvcRequestMatcher.Builder(introspector).servletPath("/eobs-ms");
+       }
+   }
+
+   @Configuration
+   public class WebConfig implements WebMvcConfigurer {
+
+       @Bean
+       public DispatcherServlet dispatcherServlet() {
+           return new DispatcherServlet();
+       }
+
+       @Bean
+       public ServletRegistrationBean<DispatcherServlet> dispatcherServletRegistration() {
+           ServletRegistrationBean<DispatcherServlet> registration = new ServletRegistrationBean<>(dispatcherServlet(), "/eobs-ms/*");
+           registration.setName("dispatcherServlet");
+           return registration;
+       }
+
+       @Bean
+       public ServletRegistrationBean<CXFServlet> cxfServletRegistration() {
+           ServletRegistrationBean<CXFServlet> registration = new ServletRegistrationBean<>(new CXFServlet(), "/services/*");
+           registration.setName("cxfServlet");
+           return registration;
+       }
+   }
